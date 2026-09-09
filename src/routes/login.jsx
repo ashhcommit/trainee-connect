@@ -18,9 +18,8 @@ export const Route = createFileRoute("/login")({
       },
     ],
   }),
-  validateSearch: (search) => ({
-    registered: search.registered === "1" ? "1" : "",
-  }),
+  // Used to show the "registration successful" message after signing up.
+  validateSearch: (search) => (search.registered === "1" ? { registered: "1" } : {}),
   component: Login,
 });
 
