@@ -11,6 +11,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import QuickRoleSwitcher from "../components/QuickRoleSwitcher";
+import PrototypeBackendNotice from "../components/PrototypeBackendNotice";
 
 function NotFoundComponent() {
   return (
@@ -77,11 +79,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Trainee Connect" },
+      {
+        name: "description",
+        content:
+          "Trainee authentication and profile platform for tracking longitudinal skilling outcomes and impact measurement.",
+      },
+      { name: "author", content: "Trainee Connect" },
+      { property: "og:title", content: "Trainee Connect" },
+      {
+        property: "og:description",
+        content:
+          "Trainee authentication and profile platform for tracking longitudinal skilling outcomes and impact measurement.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
@@ -119,8 +129,14 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="min-h-screen flex flex-col justify-between">
+        <div className="flex-1">
+          <QuickRoleSwitcher />
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </div>
+        <PrototypeBackendNotice />
+      </div>
     </QueryClientProvider>
   );
 }

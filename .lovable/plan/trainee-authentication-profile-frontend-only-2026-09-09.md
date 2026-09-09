@@ -7,6 +7,7 @@ Builds module 1 only: login, registration, protected dashboard, and trainee prof
 This project runs on TanStack Router (built in, cannot be swapped for React Router). Everything else stays exactly as specified: same routes, same field names, same API contract, same folder idea. Pages live as route files instead of a `pages/` folder, and each page component is a plain React component your team can move if they re-scaffold with Vite + React Router.
 
 Route mapping:
+
 - `/login` → `src/routes/login.tsx`
 - `/register` → `src/routes/register.tsx`
 - `/dashboard` → `src/routes/dashboard.tsx`
