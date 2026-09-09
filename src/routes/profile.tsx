@@ -32,8 +32,8 @@ function ProfileRoute() {
 }
 
 function Profile() {
-  const [profile, setProfile] = useState(null);
-  const [form, setForm] = useState(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [form, setForm] = useState<any>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -57,7 +57,7 @@ function Profile() {
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value, type, checked } = event.target;
-    setForm((previous) => ({ ...previous, [name]: type === "checkbox" ? checked : value }));
+    setForm((previous: any) => ({ ...previous, [name]: type === "checkbox" ? checked : value }));
   }
 
   async function handleSubmit(event: React.FormEvent) {

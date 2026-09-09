@@ -33,7 +33,7 @@ function DashboardRoute() {
 }
 
 function Dashboard() {
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
