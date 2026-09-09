@@ -121,6 +121,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/login'
     | '/admin/'
+    | '/employer'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
