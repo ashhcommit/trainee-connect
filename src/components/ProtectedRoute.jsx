@@ -8,20 +8,24 @@ import { getSession } from "../services/api";
  * It checks the mock session in localStorage. This is a placeholder for the
  * real authentication that the Express backend will provide later - it is not
  * a security boundary.
+ *
+ * Pass `role="admin"` to restrict a page to administrator sessions.
  */
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ children, role = "trainee" }) {
   const navigate = useNavigate();
   const [status, setStatus] = useState("checking");
 
   useEffect(() => {
     const session = getSession();
-    if (session) {
+    const loginPath = role === "admin" ? "/admin/login" : "/login";
+
+    if (session && session.role === role) {
       setStatus("allowed");
     } else {
       setStatus("denied");
-      navigate({ to: "/login" });
+      navigate({ to: loginPath });
     }
-  }, [navigate]);
+  }, [navigate, role]);
 
   if (status !== "allowed") {
     return (

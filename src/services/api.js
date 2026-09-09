@@ -13,11 +13,15 @@
 //   POST /api/auth/logout
 //   GET  /api/trainees/profile
 //   PUT  /api/trainees/profile
+//   POST /api/auth/admin/login
+//   GET  /api/admin/trainees
+//   PUT  /api/admin/trainees/:traineeId/status
 // -----------------------------------------------------------------------------
 
-import { mockUser, mockTraineeProfile } from "./mockData";
+import { mockUser, mockAdminUser, mockTraineeProfile, mockTrainees } from "./mockData";
 
 export const API_BASE_URL = "http://localhost:5000";
+
 
 // Small helper so the mock feels like a real network call.
 function delay(ms = 400) {
@@ -157,4 +161,65 @@ export async function updateTraineeProfile(data) {
   }
 
   return { success: true, profile: { ...currentProfile } };
+}
+
+// -----------------------------------------------------------------------------
+// ADMIN PANEL
+// -----------------------------------------------------------------------------
+
+// Mock store so status changes persist while the app is open.
+let currentTrainees = mockTrainees.map((trainee) => ({ ...trainee }));
+
+// POST /api/auth/admin/login
+// data: { email, password }
+export async function loginAdmin(data) {
+  // TODO: replace with the real call
+  // const response = await fetch(`${API_BASE_URL}/api/auth/admin/login`, {
+  //   method: "POST",
+  //   headers: { "Content-Type": "application/json" },
+  //   body: JSON.stringify(data),
+  // });
+  // if (!response.ok) throw new Error("Invalid administrator credentials");
+  // return response.json();
+
+  await delay();
+  const user = { ...mockAdminUser, email: data.email };
+  setSession(user);
+  return { success: true, user };
+}
+
+// GET /api/admin/trainees
+export async function getTrainees() {
+  // TODO: replace with the real call
+  // const response = await fetch(`${API_BASE_URL}/api/admin/trainees`, {
+  //   credentials: "include",
+  // });
+  // if (!response.ok) throw new Error("Could not load trainees");
+  // return response.json();
+
+  await delay();
+  return currentTrainees.map((trainee) => ({ ...trainee }));
+}
+
+// PUT /api/admin/trainees/:traineeId/status
+// data: { traineeId, status: "approved" | "rejected" | "pending" }
+export async function updateTraineeStatus({ traineeId, status }) {
+  // TODO: replace with the real call
+  // const response = await fetch(
+  //   `${API_BASE_URL}/api/admin/trainees/${traineeId}/status`,
+  //   {
+  //     method: "PUT",
+  //     headers: { "Content-Type": "application/json" },
+  //     credentials: "include",
+  //     body: JSON.stringify({ status }),
+  //   },
+  // );
+  // if (!response.ok) throw new Error("Could not update status");
+  // return response.json();
+
+  await delay(250);
+  currentTrainees = currentTrainees.map((trainee) =>
+    trainee.traineeId === traineeId ? { ...trainee, status } : trainee,
+  );
+  return { success: true, trainees: currentTrainees.map((t) => ({ ...t })) };
 }
