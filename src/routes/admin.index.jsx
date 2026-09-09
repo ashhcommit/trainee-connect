@@ -2,21 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import AdminNavbar from "../components/AdminNavbar";
 import ProtectedRoute from "../components/ProtectedRoute";
-import { getTrainees, updateTraineeStatus } from "../services/api";
+import { getAdminOutcomeRecords } from "../services/api";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({
     meta: [
-      { title: "Trainee Management | Admin Panel" },
+      { title: "Outcome Monitoring | Admin Panel" },
       {
         name: "description",
-        content:
-          "Administrator dashboard to review, approve, and reject registered trainees on the skilling outcomes platform.",
-      },
-      { property: "og:title", content: "Trainee Management | Admin Panel" },
-      {
-        property: "og:description",
-        content: "Review and manage trainee registrations from the administrator dashboard.",
+        content: "Monitor trainee employment outcomes, verification, retention, and skill gaps.",
       },
     ],
   }),
@@ -27,194 +21,131 @@ export const Route = createFileRoute("/admin/")({
   ),
 });
 
-const STATUS_LABELS = {
-  pending: "Pending review",
-  approved: "Approved",
-  rejected: "Rejected",
-};
-
 function AdminDashboard() {
-  const [trainees, setTrainees] = useState([]);
+  const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [busyId, setBusyId] = useState(null);
-  const [message, setMessage] = useState("");
+  const [employmentFilter, setEmploymentFilter] = useState("all");
+  const [verificationFilter, setVerificationFilter] = useState("all");
+  const [selectedRecord, setSelectedRecord] = useState(null);
 
   useEffect(() => {
-    let active = true;
-    getTrainees().then((data) => {
-      if (!active) return;
-      setTrainees(data);
+    getAdminOutcomeRecords().then((data) => {
+      setRecords(data);
       setLoading(false);
     });
-    return () => {
-      active = false;
-    };
   }, []);
 
-  const counts = useMemo(
-    () => ({
-      total: trainees.length,
-      pending: trainees.filter((t) => t.status === "pending").length,
-      approved: trainees.filter((t) => t.status === "approved").length,
-      rejected: trainees.filter((t) => t.status === "rejected").length,
-    }),
-    [trainees],
-  );
+  const metrics = useMemo(() => {
+    const employed = records.filter((record) => record.employmentStatus === "Employed");
+    const verified = records.filter((record) => record.verificationStatus === "Verified");
+    const salaries = employed.filter((record) => record.salary > 0).map((record) => record.salary);
+    return {
+      trainees: records.length,
+      placementRate: records.length ? Math.round((employed.length / records.length) * 100) : 0,
+      verified: verified.length,
+      averageSalary: salaries.length
+        ? Math.round(salaries.reduce((total, salary) => total + salary, 0) / salaries.length)
+        : 0,
+      flagged: records.filter((record) => record.flagged).length,
+    };
+  }, [records]);
 
-  const visible = useMemo(() => {
+  const visibleRecords = useMemo(() => {
     const term = query.trim().toLowerCase();
-    return trainees.filter((trainee) => {
-      const matchesStatus = statusFilter === "all" || trainee.status === statusFilter;
+    return records.filter((record) => {
       const matchesTerm =
         !term ||
-        [trainee.name, trainee.email, trainee.traineeId, trainee.district, trainee.state]
+        [record.name, record.traineeId, record.employer, record.jobRole, record.district, record.state]
           .join(" ")
           .toLowerCase()
           .includes(term);
-      return matchesStatus && matchesTerm;
+      const matchesEmployment =
+        employmentFilter === "all" || record.employmentStatus === employmentFilter;
+      const matchesVerification =
+        verificationFilter === "all" || record.verificationStatus === verificationFilter;
+      return matchesTerm && matchesEmployment && matchesVerification;
     });
-  }, [trainees, query, statusFilter]);
-
-  async function changeStatus(traineeId, status) {
-    setBusyId(traineeId);
-    const result = await updateTraineeStatus({ traineeId, status });
-    setTrainees(result.trainees);
-    setBusyId(null);
-    setMessage(`${traineeId} marked as ${STATUS_LABELS[status].toLowerCase()}.`);
-  }
+  }, [records, query, employmentFilter, verificationFilter]);
 
   return (
     <>
       <AdminNavbar />
       <main className="page">
         <div className="page-head">
-          <h1>Trainee Management</h1>
+          <h1>Employment Outcome Monitoring</h1>
           <p className="muted">
-            Review registrations submitted by citizens and record an approval decision.
+            Monitor placement, retention, wage progression, verification, and reported skill gaps.
           </p>
           <p className="alert alert-demo" role="note">
-            Demo mode: all trainee records and approval statuses shown here are dummy data for
-            preview purposes only.
+            Demo mode: all trainee, employment, verification, and analytics information shown here
+            is dummy data for preview purposes only.
           </p>
         </div>
 
         <div className="stat-grid">
-          <div className="card stat-card">
-            <span className="stat-value">{counts.total}</span>
-            <span className="stat-label">Registered trainees</span>
-          </div>
-          <div className="card stat-card">
-            <span className="stat-value">{counts.pending}</span>
-            <span className="stat-label">Pending review</span>
-          </div>
-          <div className="card stat-card">
-            <span className="stat-value">{counts.approved}</span>
-            <span className="stat-label">Approved</span>
-          </div>
-          <div className="card stat-card">
-            <span className="stat-value">{counts.rejected}</span>
-            <span className="stat-label">Rejected</span>
-          </div>
+          <div className="card stat-card"><span className="stat-value">{metrics.trainees}</span><span className="stat-label">Trainees tracked</span></div>
+          <div className="card stat-card"><span className="stat-value">{metrics.placementRate}%</span><span className="stat-label">Placement rate</span></div>
+          <div className="card stat-card"><span className="stat-value">{metrics.verified}</span><span className="stat-label">Verified outcomes</span></div>
+          <div className="card stat-card"><span className="stat-value">₹{metrics.averageSalary.toLocaleString()}</span><span className="stat-label">Average monthly wage</span></div>
+          <div className="card stat-card"><span className="stat-value">{metrics.flagged}</span><span className="stat-label">Flagged records</span></div>
         </div>
 
-        {message ? (
-          <p className="alert alert-success" role="status">
-            {message}
-          </p>
-        ) : null}
-
-        <div className="card">
+        <section className="card">
           <div className="card-header">
-            <h2>All trainees</h2>
-            <p className="muted">Search by name, email, trainee ID, district, or state.</p>
+            <h2>Employment outcomes</h2>
+            <p className="muted">Use filters to review verified, unverified, and flagged records.</p>
           </div>
-
           <div className="toolbar">
             <input
               type="search"
-              aria-label="Search trainees"
-              placeholder="Search trainees..."
+              aria-label="Search outcome records"
+              placeholder="Search trainee, employer, role, or location..."
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
-            <select
-              aria-label="Filter by status"
-              value={statusFilter}
-              onChange={(event) => setStatusFilter(event.target.value)}
-            >
-              <option value="all">All statuses</option>
-              <option value="pending">Pending review</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
+            <select aria-label="Filter by employment status" value={employmentFilter} onChange={(event) => setEmploymentFilter(event.target.value)}>
+              <option value="all">All employment statuses</option>
+              <option value="Employed">Employed</option>
+              <option value="Seeking employment">Seeking employment</option>
+            </select>
+            <select aria-label="Filter by verification status" value={verificationFilter} onChange={(event) => setVerificationFilter(event.target.value)}>
+              <option value="all">All verification statuses</option>
+              <option value="Verified">Verified</option>
+              <option value="Pending verification">Pending verification</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Not applicable">Not applicable</option>
             </select>
           </div>
 
           {loading ? (
-            <p className="muted">Loading trainees...</p>
-          ) : visible.length === 0 ? (
-            <p className="muted">No trainees match your search.</p>
+            <p className="muted">Loading outcome records...</p>
+          ) : visibleRecords.length === 0 ? (
+            <p className="muted">No records match the selected filters.</p>
           ) : (
             <div className="table-wrap">
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Trainee ID</th>
-                    <th>Name</th>
-                    <th>Contact</th>
-                    <th>Location</th>
-                    <th>Consent</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th>Trainee</th><th>Employment</th><th>Employer / role</th><th>Wage</th>
+                    <th>Verification</th><th>Retention</th><th>Review</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {visible.map((trainee) => (
-                    <tr key={trainee.traineeId}>
-                      <td data-label="Trainee ID">{trainee.traineeId}</td>
-                      <td data-label="Name">
-                        <strong>{trainee.name}</strong>
-                        <br />
-                        <small className="muted">Registered {trainee.registeredOn}</small>
-                      </td>
-                      <td data-label="Contact">
-                        {trainee.email}
-                        <br />
-                        <small className="muted">{trainee.phone}</small>
-                      </td>
-                      <td data-label="Location">
-                        {trainee.district}, {trainee.state}
-                      </td>
-                      <td data-label="Consent">
-                        <span className={trainee.consent ? "badge badge-yes" : "badge badge-no"}>
-                          {trainee.consent ? "Given" : "Not given"}
-                        </span>
-                      </td>
-                      <td data-label="Status">
-                        <span className={`badge status-${trainee.status}`}>
-                          {STATUS_LABELS[trainee.status]}
-                        </span>
-                      </td>
-                      <td data-label="Action">
-                        <div className="row-actions">
-                          <button
-                            type="button"
-                            className="btn btn-primary btn-sm"
-                            disabled={busyId === trainee.traineeId || trainee.status === "approved"}
-                            onClick={() => changeStatus(trainee.traineeId, "approved")}
-                          >
-                            Approve
+                  {visibleRecords.map((record) => (
+                    <tr key={record.traineeId}>
+                      <td data-label="Trainee"><strong>{record.name}</strong><br /><small className="muted">{record.traineeId}</small></td>
+                      <td data-label="Employment">{record.employmentStatus}</td>
+                      <td data-label="Employer / role">{record.employer}<br /><small className="muted">{record.jobRole}</small></td>
+                      <td data-label="Wage">{record.salary ? `₹${record.salary.toLocaleString()}` : "Not reported"}</td>
+                      <td data-label="Verification"><span className={`badge ${record.verificationStatus === "Verified" ? "badge-yes" : record.verificationStatus === "Rejected" ? "badge-no" : "status-pending"}`}>{record.verificationStatus}</span></td>
+                      <td data-label="Retention">{record.retentionStatus}</td>
+                      <td data-label="Review">
+                        {record.flagged ? (
+                          <button type="button" className="btn btn-outline btn-sm" onClick={() => setSelectedRecord(record)}>
+                            Review flagged record
                           </button>
-                          <button
-                            type="button"
-                            className="btn btn-outline btn-sm"
-                            disabled={busyId === trainee.traineeId || trainee.status === "rejected"}
-                            onClick={() => changeStatus(trainee.traineeId, "rejected")}
-                          >
-                            Reject
-                          </button>
-                        </div>
+                        ) : <span className="muted">No flag</span>}
                       </td>
                     </tr>
                   ))}
@@ -222,7 +153,25 @@ function AdminDashboard() {
               </table>
             </div>
           )}
-        </div>
+        </section>
+
+        {selectedRecord ? (
+          <section className="card flagged-card">
+            <div className="card-header">
+              <h2>Flagged record review</h2>
+              <p className="muted">{selectedRecord.name} · {selectedRecord.traineeId}</p>
+            </div>
+            <dl className="detail-list">
+              <div className="detail-row"><dt>Reported employer</dt><dd>{selectedRecord.employer}</dd></div>
+              <div className="detail-row"><dt>Verification status</dt><dd>{selectedRecord.verificationStatus}</dd></div>
+              <div className="detail-row"><dt>Reported skill gap</dt><dd>{selectedRecord.skillGap}</dd></div>
+              <div className="detail-row"><dt>Retention status</dt><dd>{selectedRecord.retentionStatus}</dd></div>
+            </dl>
+            <div className="card-footer">
+              <button type="button" className="btn btn-outline" onClick={() => setSelectedRecord(null)}>Close review</button>
+            </div>
+          </section>
+        ) : null}
       </main>
     </>
   );

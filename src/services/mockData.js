@@ -16,6 +16,13 @@ export const mockAdminUser = {
   role: "admin",
 };
 
+export const mockEmployerUser = {
+  userId: "mock-employer-id",
+  name: "Asha Industries HR",
+  email: "employer@example.com",
+  role: "employer",
+};
+
 export const mockTraineeProfile = {
   userId: "mock-user-id",
   traineeId: "mock-trainee-id",
@@ -29,7 +36,63 @@ export const mockTraineeProfile = {
   consent: true,
 };
 
-// Trainee records shown in the admin panel.
+export const mockTrainingHistory = [
+  {
+    course: "Industrial Electrician",
+    provider: "West Bengal Skills Centre",
+    completedOn: "2026-05-18",
+    status: "Completed",
+  },
+  {
+    course: "Workplace Safety Essentials",
+    provider: "West Bengal Skills Centre",
+    completedOn: "2026-05-25",
+    status: "Completed",
+  },
+];
+
+export const mockEmploymentOutcome = {
+  traineeId: "mock-trainee-id",
+  employmentStatus: "Employed",
+  employer: "Asha Industries",
+  jobRole: "Electrical Technician",
+  salary: "22000",
+  joinedOn: "2026-06-10",
+  verificationStatus: "Pending employer verification",
+  lastUpdated: "2026-09-01",
+  flagged: false,
+  skillGap: "Advanced PLC maintenance",
+};
+
+export const mockFollowUps = [
+  { milestone: "30-day follow-up", dueOn: "2026-07-10", status: "Completed" },
+  { milestone: "90-day follow-up", dueOn: "2026-09-08", status: "Due now" },
+  { milestone: "180-day follow-up", dueOn: "2026-12-07", status: "Upcoming" },
+];
+
+export const mockVerificationRequests = [
+  {
+    verificationId: "VER-2001",
+    traineeId: "TRN-1001",
+    traineeName: "Rahul Kumar",
+    employer: "Asha Industries",
+    jobRole: "Electrical Technician",
+    salary: "22000",
+    joinedOn: "2026-06-10",
+    status: "Pending verification",
+  },
+  {
+    verificationId: "VER-2002",
+    traineeId: "TRN-1006",
+    traineeName: "Meera Das",
+    employer: "Eastern Manufacturing",
+    jobRole: "Machine Operator",
+    salary: "19500",
+    joinedOn: "2026-07-02",
+    status: "Pending verification",
+  },
+];
+
 export const mockTrainees = [
   {
     traineeId: "TRN-1001",
@@ -39,7 +102,14 @@ export const mockTrainees = [
     district: "Kolkata",
     state: "West Bengal",
     consent: true,
-    status: "pending",
+    employmentStatus: "Employed",
+    employer: "Asha Industries",
+    jobRole: "Electrical Technician",
+    salary: 22000,
+    verificationStatus: "Pending verification",
+    retentionStatus: "30 days retained",
+    skillGap: "Advanced PLC maintenance",
+    flagged: false,
     registeredOn: "2026-08-12",
   },
   {
@@ -50,7 +120,14 @@ export const mockTrainees = [
     district: "Jaipur",
     state: "Rajasthan",
     consent: true,
-    status: "approved",
+    employmentStatus: "Employed",
+    employer: "Rajasthan Textiles",
+    jobRole: "Quality Assistant",
+    salary: 24000,
+    verificationStatus: "Verified",
+    retentionStatus: "90 days retained",
+    skillGap: "None reported",
+    flagged: false,
     registeredOn: "2026-08-14",
   },
   {
@@ -61,7 +138,14 @@ export const mockTrainees = [
     district: "Hyderabad",
     state: "Telangana",
     consent: false,
-    status: "pending",
+    employmentStatus: "Seeking employment",
+    employer: "Not reported",
+    jobRole: "Not reported",
+    salary: 0,
+    verificationStatus: "Not applicable",
+    retentionStatus: "Not applicable",
+    skillGap: "Interview readiness",
+    flagged: true,
     registeredOn: "2026-08-19",
   },
   {
@@ -72,7 +156,14 @@ export const mockTrainees = [
     district: "Ernakulam",
     state: "Kerala",
     consent: true,
-    status: "rejected",
+    employmentStatus: "Employed",
+    employer: "Coastal Foods",
+    jobRole: "Production Associate",
+    salary: 21000,
+    verificationStatus: "Rejected",
+    retentionStatus: "30 days retained",
+    skillGap: "Workplace communication",
+    flagged: true,
     registeredOn: "2026-08-21",
   },
   {
@@ -83,7 +174,14 @@ export const mockTrainees = [
     district: "Lucknow",
     state: "Uttar Pradesh",
     consent: true,
-    status: "approved",
+    employmentStatus: "Employed",
+    employer: "Lucknow Logistics",
+    jobRole: "Warehouse Associate",
+    salary: 18000,
+    verificationStatus: "Verified",
+    retentionStatus: "180 days retained",
+    skillGap: "None reported",
+    flagged: false,
     registeredOn: "2026-09-01",
   },
 ];

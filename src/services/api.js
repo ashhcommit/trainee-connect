@@ -1,41 +1,25 @@
-// -----------------------------------------------------------------------------
-// API SERVICE LAYER
-// -----------------------------------------------------------------------------
-// Every call to the backend must go through this file. React components import
-// these functions instead of calling fetch/axios directly.
-//
-// Right now each function returns mock data. To connect the real Express API,
-// replace the mock block inside each function with the commented fetch call.
-//
-// Agreed API contract (owned by the backend team):
-//   POST /api/auth/register
-//   POST /api/auth/login
-//   POST /api/auth/logout
-//   GET  /api/trainees/profile
-//   PUT  /api/trainees/profile
-//   POST /api/auth/admin/login
-//   GET  /api/admin/trainees
-//   PUT  /api/admin/trainees/:traineeId/status
-// -----------------------------------------------------------------------------
+// All backend communication belongs in this service layer.
+// Replace the mock returns with the agreed Express API calls when the backend is ready.
 
-import { mockUser, mockAdminUser, mockTraineeProfile, mockTrainees } from "./mockData";
+import {
+  mockAdminUser,
+  mockEmployerUser,
+  mockEmploymentOutcome,
+  mockFollowUps,
+  mockTraineeProfile,
+  mockTrainees,
+  mockTrainingHistory,
+  mockUser,
+  mockVerificationRequests,
+} from "./mockData";
 
 export const API_BASE_URL = "http://localhost:5000";
 
-
-// Small helper so the mock feels like a real network call.
-function delay(ms = 400) {
+function delay(ms = 300) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// -----------------------------------------------------------------------------
-// SESSION HELPERS (frontend placeholder only)
-// -----------------------------------------------------------------------------
-// NOTE: storing the session in localStorage is NOT production-grade security.
-// It only exists so the frontend can be demonstrated before the Express backend
-// is connected. Real authentication (httpOnly cookie or token issued by the
-// backend) replaces this later.
-
+// Frontend placeholder only. This is not production-grade authentication.
 const SESSION_KEY = "lsoim_mock_session";
 
 export function getSession() {
@@ -59,22 +43,9 @@ export function clearSession() {
   window.localStorage.removeItem(SESSION_KEY);
 }
 
-// -----------------------------------------------------------------------------
-// AUTHENTICATION
-// -----------------------------------------------------------------------------
-
 // POST /api/auth/register
-// data: { name, email, password, role: "trainee", phone, district, state, consent }
 export async function registerUser(data) {
-  // TODO: replace with the real call
-  // const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify(data),
-  // });
-  // if (!response.ok) throw new Error("Registration failed");
-  // return response.json();
-
+  // TODO: replace with fetch(`${API_BASE_URL}/api/auth/register`, ...)
   await delay();
   return {
     success: true,
@@ -90,136 +61,117 @@ export async function registerUser(data) {
 }
 
 // POST /api/auth/login
-// data: { email, password }
 export async function loginUser(data) {
-  // TODO: replace with the real call
-  // const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify(data),
-  // });
-  // if (!response.ok) throw new Error("Invalid email or password");
-  // return response.json();
-
+  // TODO: replace with fetch(`${API_BASE_URL}/api/auth/login`, ...)
   await delay();
   const user = { ...mockUser, email: data.email };
   setSession(user);
   return { success: true, user };
 }
 
-// POST /api/auth/logout
-export async function logoutUser() {
-  // TODO: replace with the real call
-  // await fetch(`${API_BASE_URL}/api/auth/logout`, { method: "POST" });
-
-  await delay(150);
-  clearSession();
-  return { success: true };
-}
-
-// -----------------------------------------------------------------------------
-// TRAINEE PROFILE
-// -----------------------------------------------------------------------------
-
-// Mock store for the profile so edits persist while the app is open.
-let currentProfile = { ...mockTraineeProfile };
-
-// GET /api/trainees/profile
-export async function getTraineeProfile() {
-  // TODO: replace with the real call
-  // const response = await fetch(`${API_BASE_URL}/api/trainees/profile`, {
-  //   credentials: "include",
-  // });
-  // if (!response.ok) throw new Error("Could not load profile");
-  // return response.json();
-
-  await delay();
-  const session = getSession();
-  return { ...currentProfile, email: session?.email ?? currentProfile.email };
-}
-
-// PUT /api/trainees/profile
-// data: { name, email, phone, district, state, consent }
-export async function updateTraineeProfile(data) {
-  // TODO: replace with the real call
-  // const response = await fetch(`${API_BASE_URL}/api/trainees/profile`, {
-  //   method: "PUT",
-  //   headers: { "Content-Type": "application/json" },
-  //   credentials: "include",
-  //   body: JSON.stringify(data),
-  // });
-  // if (!response.ok) throw new Error("Could not save profile");
-  // return response.json();
-
-  await delay();
-  currentProfile = { ...currentProfile, ...data };
-
-  // Keep the mock session in sync with the edited name/email.
-  const session = getSession();
-  if (session) {
-    setSession({ ...session, name: currentProfile.name, email: currentProfile.email });
-  }
-
-  return { success: true, profile: { ...currentProfile } };
-}
-
-// -----------------------------------------------------------------------------
-// ADMIN PANEL
-// -----------------------------------------------------------------------------
-
-// Mock store so status changes persist while the app is open.
-let currentTrainees = mockTrainees.map((trainee) => ({ ...trainee }));
-
 // POST /api/auth/admin/login
-// data: { email, password }
 export async function loginAdmin(data) {
-  // TODO: replace with the real call
-  // const response = await fetch(`${API_BASE_URL}/api/auth/admin/login`, {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify(data),
-  // });
-  // if (!response.ok) throw new Error("Invalid administrator credentials");
-  // return response.json();
-
+  // TODO: replace with fetch(`${API_BASE_URL}/api/auth/admin/login`, ...)
   await delay();
   const user = { ...mockAdminUser, email: data.email };
   setSession(user);
   return { success: true, user };
 }
 
-// GET /api/admin/trainees
-export async function getTrainees() {
-  // TODO: replace with the real call
-  // const response = await fetch(`${API_BASE_URL}/api/admin/trainees`, {
-  //   credentials: "include",
-  // });
-  // if (!response.ok) throw new Error("Could not load trainees");
-  // return response.json();
-
+// POST /api/auth/employer/login
+export async function loginEmployer(data) {
+  // TODO: replace with fetch(`${API_BASE_URL}/api/auth/employer/login`, ...)
   await delay();
-  return currentTrainees.map((trainee) => ({ ...trainee }));
+  const user = { ...mockEmployerUser, email: data.email };
+  setSession(user);
+  return { success: true, user };
 }
 
-// PUT /api/admin/trainees/:traineeId/status
-// data: { traineeId, status: "approved" | "rejected" | "pending" }
-export async function updateTraineeStatus({ traineeId, status }) {
-  // TODO: replace with the real call
-  // const response = await fetch(
-  //   `${API_BASE_URL}/api/admin/trainees/${traineeId}/status`,
-  //   {
-  //     method: "PUT",
-  //     headers: { "Content-Type": "application/json" },
-  //     credentials: "include",
-  //     body: JSON.stringify({ status }),
-  //   },
-  // );
-  // if (!response.ok) throw new Error("Could not update status");
-  // return response.json();
+// POST /api/auth/logout
+export async function logoutUser() {
+  // TODO: replace with fetch(`${API_BASE_URL}/api/auth/logout`, ...)
+  await delay(150);
+  clearSession();
+  return { success: true };
+}
 
+let currentProfile = { ...mockTraineeProfile };
+let currentEmploymentOutcome = { ...mockEmploymentOutcome };
+let currentVerificationRequests = mockVerificationRequests.map((request) => ({ ...request }));
+let currentTrainees = mockTrainees.map((trainee) => ({ ...trainee }));
+
+// GET /api/trainees/profile
+export async function getTraineeProfile() {
+  // TODO: replace with fetch(`${API_BASE_URL}/api/trainees/profile`, ...)
+  await delay();
+  const session = getSession();
+  return { ...currentProfile, email: session?.email ?? currentProfile.email };
+}
+
+// PUT /api/trainees/profile
+export async function updateTraineeProfile(data) {
+  // TODO: replace with fetch(`${API_BASE_URL}/api/trainees/profile`, ...)
+  await delay();
+  currentProfile = { ...currentProfile, ...data };
+  const session = getSession();
+  if (session) setSession({ ...session, name: currentProfile.name, email: currentProfile.email });
+  return { success: true, profile: { ...currentProfile } };
+}
+
+// GET /api/trainees/training-history
+export async function getTrainingHistory() {
+  // TODO: replace with fetch(`${API_BASE_URL}/api/trainees/training-history`, ...)
+  await delay(180);
+  return mockTrainingHistory.map((record) => ({ ...record }));
+}
+
+// GET /api/trainees/employment-outcome
+export async function getEmploymentOutcome() {
+  // TODO: replace with fetch(`${API_BASE_URL}/api/trainees/employment-outcome`, ...)
+  await delay(180);
+  return { ...currentEmploymentOutcome };
+}
+
+// PUT /api/trainees/employment-outcome
+export async function submitEmploymentOutcome(data) {
+  // TODO: replace with fetch(`${API_BASE_URL}/api/trainees/employment-outcome`, ...)
   await delay(250);
-  currentTrainees = currentTrainees.map((trainee) =>
-    trainee.traineeId === traineeId ? { ...trainee, status } : trainee,
+  currentEmploymentOutcome = {
+    ...currentEmploymentOutcome,
+    ...data,
+    verificationStatus: "Pending employer verification",
+    lastUpdated: "2026-09-09",
+  };
+  return { success: true, outcome: { ...currentEmploymentOutcome } };
+}
+
+// GET /api/trainees/follow-ups
+export async function getFollowUps() {
+  // TODO: replace with fetch(`${API_BASE_URL}/api/trainees/follow-ups`, ...)
+  await delay(180);
+  return mockFollowUps.map((followUp) => ({ ...followUp }));
+}
+
+// GET /api/employer/verification-requests
+export async function getEmployerVerificationRequests() {
+  // TODO: replace with fetch(`${API_BASE_URL}/api/employer/verification-requests`, ...)
+  await delay(220);
+  return currentVerificationRequests.map((request) => ({ ...request }));
+}
+
+// PUT /api/employer/verification-requests/:verificationId
+export async function updateEmploymentVerification({ verificationId, status }) {
+  // TODO: replace with fetch(`${API_BASE_URL}/api/employer/verification-requests/${verificationId}`, ...)
+  await delay(220);
+  currentVerificationRequests = currentVerificationRequests.map((request) =>
+    request.verificationId === verificationId ? { ...request, status } : request,
   );
-  return { success: true, trainees: currentTrainees.map((t) => ({ ...t })) };
+  return { success: true, requests: currentVerificationRequests.map((request) => ({ ...request })) };
+}
+
+// GET /api/admin/outcomes
+export async function getAdminOutcomeRecords() {
+  // TODO: replace with fetch(`${API_BASE_URL}/api/admin/outcomes`, ...)
+  await delay(250);
+  return currentTrainees.map((trainee) => ({ ...trainee }));
 }

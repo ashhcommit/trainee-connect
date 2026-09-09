@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
-import { loginAdmin, loginUser } from "../services/api";
+import { loginAdmin, loginEmployer, loginUser } from "../services/api";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -53,6 +53,9 @@ export default function LoginPage() {
     if (role === "admin") {
       await loginAdmin({ email: form.email.trim(), password: form.password });
       navigate({ to: "/admin" });
+    } else if (role === "employer") {
+      await loginEmployer({ email: form.email.trim(), password: form.password });
+      navigate({ to: "/employer" });
     } else {
       await loginUser({ email: form.email.trim(), password: form.password });
       navigate({ to: "/dashboard" });
@@ -61,6 +64,7 @@ export default function LoginPage() {
   }
 
   const isAdmin = role === "admin";
+  const isEmployer = role === "employer";
 
   return (
     <main className="auth-page">
@@ -68,7 +72,7 @@ export default function LoginPage() {
         <div className="auth-intro">
           <span className="navbar-mark">LS</span>
           <h1>Longitudinal Skilling Outcomes and Impact Measurement Platform</h1>
-          <p>Sign in as an administrator or citizen to continue to the appropriate dashboard.</p>
+          <p>Sign in as a citizen, employer, or administrator to continue to the appropriate dashboard.</p>
         </div>
 
         <div className="card auth-card">
@@ -83,17 +87,26 @@ export default function LoginPage() {
               </button>
               <button
                 type="button"
+                className={role === "employer" ? "is-selected" : ""}
+                onClick={() => setRole("employer")}
+              >
+                Employer Login
+              </button>
+              <button
+                type="button"
                 className={isAdmin ? "is-selected" : ""}
                 onClick={() => setRole("admin")}
               >
                 Admin Login
               </button>
             </div>
-            <h2>{isAdmin ? "Administrator Login" : "Citizen Login"}</h2>
+            <h2>{isAdmin ? "Administrator Login" : isEmployer ? "Employer Login" : "Citizen Login"}</h2>
             <p className="muted">
               {isAdmin
-                ? "Use the administrator demo account to review registrations."
-                : "Sign in with your registered citizen account."}
+                ? "Monitor employment outcomes and flagged records."
+                : isEmployer
+                  ? "Verify employment details reported by trainees."
+                  : "View your training, employment, and follow-up information."}
             </p>
           </div>
 
@@ -104,7 +117,11 @@ export default function LoginPage() {
           ) : null}
 
           <p className="alert alert-demo" role="note">
-            Demo login: {isAdmin ? "admin@example.com / admin123" : "rahul@example.com / citizen123"}
+            Demo login: {isAdmin
+              ? "admin@example.com / admin123"
+              : isEmployer
+                ? "employer@example.com / employer123"
+                : "rahul@example.com / citizen123"}
           </p>
 
           <form onSubmit={handleSubmit} noValidate>
@@ -135,11 +152,17 @@ export default function LoginPage() {
             </div>
 
             <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
-              {submitting ? "Signing in..." : isAdmin ? "Login as Administrator" : "Login as Citizen"}
+              {submitting
+                ? "Signing in..."
+                : isAdmin
+                  ? "Login as Administrator"
+                  : isEmployer
+                    ? "Login as Employer"
+                    : "Login as Citizen"}
             </button>
           </form>
 
-          {!isAdmin ? (
+          {role === "citizen" ? (
             <p className="form-note">
               New citizen? <Link to="/register">Create an account</Link>
             </p>

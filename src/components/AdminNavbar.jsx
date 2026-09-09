@@ -25,7 +25,7 @@ export default function AdminNavbar() {
 
         <nav className="navbar-links" aria-label="Admin navigation">
           <Link to="/admin" activeProps={{ className: "is-active" }}>
-            Trainees
+            Outcomes
           </Link>
           <button type="button" className="btn btn-outline btn-sm" onClick={handleLogout}>
             Logout

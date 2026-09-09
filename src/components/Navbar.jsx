@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { logoutUser } from "../services/api";
+import { getSession, logoutUser } from "../services/api";
 
 /**
  * Top navigation shown on the protected pages (Dashboard and Profile).
  */
 export default function Navbar() {
   const navigate = useNavigate();
+  const isEmployer = getSession()?.role === "employer";
 
   async function handleLogout() {
     await logoutUser();
@@ -15,7 +16,7 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-inner">
-        <Link to="/dashboard" className="navbar-brand">
+        <Link to={isEmployer ? "/employer" : "/dashboard"} className="navbar-brand">
           <span className="navbar-mark">LS</span>
           <span>
             <strong>Skilling Outcomes Platform</strong>
@@ -24,12 +25,20 @@ export default function Navbar() {
         </Link>
 
         <nav className="navbar-links" aria-label="Main navigation">
-          <Link to="/dashboard" activeProps={{ className: "is-active" }}>
-            Dashboard
-          </Link>
-          <Link to="/profile" activeProps={{ className: "is-active" }}>
-            Profile
-          </Link>
+          {isEmployer ? (
+            <Link to="/employer" activeProps={{ className: "is-active" }}>
+              Verification
+            </Link>
+          ) : (
+            <>
+              <Link to="/dashboard" activeProps={{ className: "is-active" }}>
+                Dashboard
+              </Link>
+              <Link to="/profile" activeProps={{ className: "is-active" }}>
+                Profile
+              </Link>
+            </>
+          )}
           <button type="button" className="btn btn-outline btn-sm" onClick={handleLogout}>
             Logout
           </button>
