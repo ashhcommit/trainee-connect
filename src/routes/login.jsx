@@ -1,32 +1,32 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
-import { loginUser } from "../services/api";
+import { loginAdmin, loginUser } from "../services/api";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Trainee Login | Skilling Outcomes Platform" },
+      { title: "Login | Skilling Outcomes Platform" },
       {
         name: "description",
         content:
-          "Sign in to the Longitudinal Skilling Outcomes and Impact Measurement Platform to view your trainee profile.",
+          "Sign in as an administrator or citizen to access the skilling outcomes platform.",
       },
-      { property: "og:title", content: "Trainee Login | Skilling Outcomes Platform" },
+      { property: "og:title", content: "Login | Skilling Outcomes Platform" },
       {
         property: "og:description",
-        content: "Secure trainee sign-in for the skilling outcomes measurement platform.",
+        content: "Administrator and citizen sign-in for the skilling outcomes platform.",
       },
     ],
   }),
-  // Used to show the "registration successful" message after signing up.
   validateSearch: (search) => (search.registered === "1" ? { registered: "1" } : {}),
-  component: Login,
+  component: LoginPage,
 });
 
-function Login() {
+export default function LoginPage() {
   const navigate = useNavigate();
-  const { registered } = Route.useSearch();
-
+  const search = useSearch({ strict: false });
+  const showRegistrationMessage = search.registered === "1";
+  const [role, setRole] = useState("citizen");
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -50,11 +50,17 @@ function Login() {
     if (Object.keys(nextErrors).length > 0) return;
 
     setSubmitting(true);
-    // All backend communication goes through the API service layer.
-    await loginUser({ email: form.email.trim(), password: form.password });
+    if (role === "admin") {
+      await loginAdmin({ email: form.email.trim(), password: form.password });
+      navigate({ to: "/admin" });
+    } else {
+      await loginUser({ email: form.email.trim(), password: form.password });
+      navigate({ to: "/dashboard" });
+    }
     setSubmitting(false);
-    navigate({ to: "/dashboard" });
   }
+
+  const isAdmin = role === "admin";
 
   return (
     <main className="auth-page">
@@ -62,23 +68,44 @@ function Login() {
         <div className="auth-intro">
           <span className="navbar-mark">LS</span>
           <h1>Longitudinal Skilling Outcomes and Impact Measurement Platform</h1>
-          <p>
-            A public-service platform that follows trainees after their skill-development
-            training, so outcomes can be measured over time.
-          </p>
+          <p>Sign in as an administrator or citizen to continue to the appropriate dashboard.</p>
         </div>
 
         <div className="card auth-card">
           <div className="card-header">
-            <h2>Trainee Login</h2>
-            <p className="muted">Sign in with your registered email address.</p>
+            <div className="login-toggle" role="group" aria-label="Choose login type">
+              <button
+                type="button"
+                className={!isAdmin ? "is-selected" : ""}
+                onClick={() => setRole("citizen")}
+              >
+                Citizen Login
+              </button>
+              <button
+                type="button"
+                className={isAdmin ? "is-selected" : ""}
+                onClick={() => setRole("admin")}
+              >
+                Admin Login
+              </button>
+            </div>
+            <h2>{isAdmin ? "Administrator Login" : "Citizen Login"}</h2>
+            <p className="muted">
+              {isAdmin
+                ? "Use the administrator demo account to review registrations."
+                : "Sign in with your registered citizen account."}
+            </p>
           </div>
 
-          {registered === "1" ? (
+          {showRegistrationMessage ? (
             <p className="alert alert-success" role="status">
               Registration successful. Please log in to continue.
             </p>
           ) : null}
+
+          <p className="alert alert-demo" role="note">
+            Demo login: {isAdmin ? "admin@example.com / admin123" : "rahul@example.com / citizen123"}
+          </p>
 
           <form onSubmit={handleSubmit} noValidate>
             <div className="field">
@@ -108,13 +135,15 @@ function Login() {
             </div>
 
             <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
-              {submitting ? "Signing in..." : "Login"}
+              {submitting ? "Signing in..." : isAdmin ? "Login as Administrator" : "Login as Citizen"}
             </button>
           </form>
 
-          <p className="form-note">
-            New trainee? <Link to="/register">Create an account</Link>
-          </p>
+          {!isAdmin ? (
+            <p className="form-note">
+              New citizen? <Link to="/register">Create an account</Link>
+            </p>
+          ) : null}
         </div>
       </div>
     </main>

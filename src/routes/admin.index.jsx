@@ -92,7 +92,11 @@ function AdminDashboard() {
         <div className="page-head">
           <h1>Trainee Management</h1>
           <p className="muted">
-            Review registrations submitted by trainees and record an approval decision.
+            Review registrations submitted by citizens and record an approval decision.
+          </p>
+          <p className="alert alert-demo" role="note">
+            Demo mode: all trainee records and approval statuses shown here are dummy data for
+            preview purposes only.
           </p>
         </div>
 

@@ -245,6 +245,12 @@ body {
 /* Alerts */
 .alert { border-radius: 6px; padding: 0.7rem 0.9rem; font-size: 0.9rem; margin: 0 0 1rem; }
 .alert-success { background: #e4f1ea; border: 1px solid #b6d9c6; color: #14543e; }
+.alert-demo { background: #fff7e6; border: 1px solid #e6c878; color: #6d4c00; }
+
+.login-toggle { display: flex; gap: 0.35rem; margin-bottom: 1rem; padding: 0.25rem; background: #eef2f7; border-radius: 6px; }
+.login-toggle button { flex: 1; border: 0; border-radius: 4px; padding: 0.5rem 0.6rem; background: transparent; color: var(--gov-muted); font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+.login-toggle button:hover { color: var(--gov-navy); }
+.login-toggle button.is-selected { background: #fff; color: var(--gov-navy); box-shadow: 0 1px 3px rgb(18 49 92 / 18%); }
 
 /* Admin dashboard */
 .page-head { margin-bottom: 1.5rem; }

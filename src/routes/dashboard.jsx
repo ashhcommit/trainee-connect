@@ -52,8 +52,11 @@ function Dashboard() {
         <div className="page-header">
           <h1>{loading ? "Welcome" : `Welcome, ${firstName}`}</h1>
           <p className="muted">
-            This is your trainee dashboard. Your profile stays linked to your outcomes over
-            time.
+            This is your citizen dashboard. Your profile stays linked to your outcomes over time.
+          </p>
+          <p className="alert alert-demo" role="note">
+            Demo mode: the profile and dashboard information shown here is dummy data for preview
+            purposes only.
           </p>
         </div>
 
@@ -62,7 +65,7 @@ function Dashboard() {
         ) : (
           <div className="grid">
             <ProfileCard
-              title="Profile summary"
+              title="Profile summary (dummy data)"
               rows={[
                 { label: "Name", value: profile.name },
                 { label: "District", value: profile.district },

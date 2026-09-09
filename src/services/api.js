@@ -84,7 +84,7 @@ export async function registerUser(data) {
       traineeId: "mock-trainee-id",
       name: data.name,
       email: data.email,
-      role: "trainee",
+      role: "citizen",
     },
   };
 }

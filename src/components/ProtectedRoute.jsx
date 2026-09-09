@@ -11,7 +11,7 @@ import { getSession } from "../services/api";
  *
  * Pass `role="admin"` to restrict a page to administrator sessions.
  */
-export default function ProtectedRoute({ children, role = "trainee" }) {
+export default function ProtectedRoute({ children, role = "citizen" }) {
   const navigate = useNavigate();
   const [status, setStatus] = useState("checking");
 

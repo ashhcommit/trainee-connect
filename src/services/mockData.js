@@ -6,7 +6,7 @@ export const mockUser = {
   traineeId: "mock-trainee-id",
   name: "Rahul Kumar",
   email: "rahul@example.com",
-  role: "trainee",
+  role: "citizen",
 };
 
 export const mockAdminUser = {
@@ -21,7 +21,7 @@ export const mockTraineeProfile = {
   traineeId: "mock-trainee-id",
   name: "Rahul Kumar",
   email: "rahul@example.com",
-  role: "trainee",
+  role: "citizen",
   phone: "9876543210",
   district: "Kolkata",
   state: "West Bengal",
