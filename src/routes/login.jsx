@@ -18,8 +18,8 @@ export const Route = createFileRoute("/login")({
       },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>) => ({
-    registered: search.registered === "1" ? "1" : undefined,
+  validateSearch: (search) => ({
+    registered: search.registered === "1" ? "1" : "",
   }),
   component: Login,
 });
@@ -29,22 +29,22 @@ function Login() {
   const { registered } = Route.useSearch();
 
   const [form, setForm] = useState({ email: "", password: "" });
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(event) {
     const { name, value } = event.target;
     setForm((previous) => ({ ...previous, [name]: value }));
   }
 
   function validate() {
-    const nextErrors: { email?: string; password?: string } = {};
+    const nextErrors = {};
     if (!form.email.trim()) nextErrors.email = "Email is required.";
     if (!form.password) nextErrors.password = "Password is required.";
     return nextErrors;
   }
 
-  async function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const nextErrors = validate();
     setErrors(nextErrors);

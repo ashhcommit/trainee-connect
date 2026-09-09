@@ -35,16 +35,16 @@ const initialForm = {
 function Register() {
   const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(event) {
     const { name, value, type, checked } = event.target;
     setForm((previous) => ({ ...previous, [name]: type === "checkbox" ? checked : value }));
   }
 
   function validate() {
-    const nextErrors: Record<string, string> = {};
+    const nextErrors = {};
     if (!form.name.trim()) nextErrors.name = "Name is required.";
     if (!form.email.trim()) {
       nextErrors.email = "Email is required.";
@@ -59,7 +59,7 @@ function Register() {
     return nextErrors;
   }
 
-  async function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const nextErrors = validate();
     setErrors(nextErrors);
