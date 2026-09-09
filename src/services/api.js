@@ -13,11 +13,15 @@
 //   POST /api/auth/logout
 //   GET  /api/trainees/profile
 //   PUT  /api/trainees/profile
+//   POST /api/auth/admin/login
+//   GET  /api/admin/trainees
+//   PUT  /api/admin/trainees/:traineeId/status
 // -----------------------------------------------------------------------------
 
-import { mockUser, mockTraineeProfile } from "./mockData";
+import { mockUser, mockAdminUser, mockTraineeProfile, mockTrainees } from "./mockData";
 
 export const API_BASE_URL = "http://localhost:5000";
+
 
 // Small helper so the mock feels like a real network call.
 function delay(ms = 400) {
